@@ -629,7 +629,7 @@ input[type=number]{-moz-appearance:textfield}
   function render() {
     document.documentElement.setAttribute('data-theme', S.settings.theme);
     var fn = { plan: pagePlan, afford: pageAfford, vendors: pageVendors, calendar: pageCalendar, budget: pageBudget, guests: pageGuests, setup: pageSetup }[page], scroll = window.scrollY, ae = document.activeElement, aid = ae && ae.id;
-    document.getElementById('app').innerHTML = (DEMO ? '<div class="banner" style="background:var(--soft);color:var(--ink)"><b>Free demo.</b> Everything works with sample numbers. Backup, restore and CSV export are in the full app file (LedgerAndEase on Etsy).</div>' : '') +
+    document.getElementById('app').innerHTML = (DEMO ? '<div class="banner" style="background:var(--soft);color:var(--ink)"><b>Free demo.</b> This is a sample wedding. Tap Setup to enter your own numbers and see your plan. Backup, restore and CSV export are in the full app file (LedgerAndEase on Etsy).</div>' : '') +
       (storageOK ? '' : '<div class="banner">This browser is not saving your data (private window or blocked storage). Use Download backup in Setup so you do not lose your work.</div>') +
       '<header class="top"><div class="brand">Wedding Budget<small>Plan every payment · works offline · data stays on this device</small></div></header><nav class="tabs" aria-label="Pages">' +
       PAGES.map(function (p) { return '<button data-nav="' + p[0] + '"' + (p[0] === page ? ' aria-current="page"' : '') + '>' + p[1] + '</button>'; }).join('') + '</nav><main>' + fn() + '</main>';
