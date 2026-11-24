@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wedding Budget App</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#a8435c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wedding Budget"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<style>:root{--bg:#fbf4f2;--card:#ffffff;--ink:#3a2b30;--muted:#7a6469;--line:#f0dedb;--accent:#a8435c;--accent-ink:#ffffff;--good:#1f7a5c;--good-bg:#e0f1e8;--warn:#a8540f;--warn-bg:#fbefe2;--bad:#b23a48;--bad-bg:#f9e6e8;--soft:#f7e8e5;--bar:#eccfca;--shadow:0 1px 2px rgba(58,43,48,.06),0 6px 18px rgba(58,43,48,.06)}
+[data-theme=sage]{--bg:#eef3ef;--card:#ffffff;--ink:#1d2b25;--muted:#5d6e66;--line:#dbe6df;--accent:#2f7d62;--accent-ink:#ffffff;--good:#1f7a5c;--good-bg:#e0f1e8;--warn:#a8540f;--warn-bg:#fbefe2;--bad:#b23a48;--bad-bg:#f9e6e8;--soft:#e3eee7;--bar:#cfe0d6}
+[data-theme=midnight]{--bg:#0f1426;--card:#171d36;--ink:#e8ecff;--muted:#99a3c9;--line:#2a3358;--accent:#8fa2ff;--accent-ink:#0f1426;--good:#5fe0b4;--good-bg:#15332f;--warn:#ffb27a;--warn-bg:#3a2a22;--bad:#ff8fb1;--bad-bg:#3a1f2c;--soft:#1e2646;--bar:#2e3868;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:16px 16px 90px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 12px}
+.brand{font-weight:800;font-size:20px;letter-spacing:-.3px}.brand small{display:block;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0 14px;scrollbar-width:thin}
+nav.tabs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:600}
+nav.tabs button[aria-current=page]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+nav.tabs button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:18px}.card h3{margin:14px 0 6px;font-size:15px}
+.grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:720px){.g3,.g2{grid-template-columns:1fr}.wrap{padding-bottom:60px}}
+.hero{text-align:center;padding:26px 16px;background:linear-gradient(160deg,var(--soft),var(--card))}
+.hero .label{color:var(--muted);font-weight:600}.hero .big{font-size:56px;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin:6px 0}
+.hero .sub{color:var(--muted)}
+.pill{display:inline-block;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700}
+.pill.good{background:var(--good-bg);color:var(--good)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.mute{background:var(--soft);color:var(--muted)}
+.stat .v{font-size:26px;font-weight:800;letter-spacing:-.5px}.stat .l{color:var(--muted);font-size:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.row:first-child{border-top:0}
+.row .main{min-width:0;flex:1}.row .t{font-weight:600;overflow-wrap:anywhere}.row .s{color:var(--muted);font-size:14px}
+.amt{font-weight:700;white-space:nowrap}.neg{color:var(--bad)}.pos{color:var(--good)}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.btn.small{padding:5px 10px;font-size:14px}.btn.danger{color:var(--bad)}
+.btn:hover{filter:brightness(.97)}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}.field label{font-size:14px;font-weight:600;color:var(--muted)}
+input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.inline{display:grid;grid-template-columns:1fr 1.2fr 1.6fr auto;gap:8px;align-items:end}
+@media(max-width:720px){.inline{grid-template-columns:1fr 1fr}.inline .btn{grid-column:span 2}}
+.bar{height:10px;background:var(--bar);border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:999px}.bar.over i{background:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:8px 6px;text-align:left;border-top:1px solid var(--line)}th{color:var(--muted);font-weight:600;border-top:0}td.r,th.r{text-align:right}
+td input{padding:6px 8px;max-width:110px;text-align:right}
+.math div{display:flex;justify-content:space-between;gap:12px;padding:4px 0}.math .tot{border-top:2px solid var(--line);margin-top:4px;padding-top:8px;font-weight:800}
+details summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.note{color:var(--muted);font-size:14px}.empty{text-align:center;color:var(--muted);padding:18px}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}.steps li{counter-increment:s;display:flex;gap:12px;align-items:center;padding:8px 0}
+.steps li:before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:800;flex:none}
+.steps li.done:before{content:"\2713";background:var(--good-bg);color:var(--good)}
+.ovl{position:fixed;inset:0;background:rgba(10,12,30,.55);display:grid;place-items:center;padding:16px;z-index:10}
+.modal{background:var(--card);border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:92vh;overflow:auto;box-shadow:var(--shadow)}
+.modal h2{margin:0 0 12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}.seg button{border:0;background:var(--card);padding:8px 14px;cursor:pointer;font-weight:600;color:var(--muted)}.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.tag{font-size:12px;font-weight:700;border-radius:6px;padding:1px 7px;background:var(--soft);color:var(--muted);margin-left:6px}
+@media print{nav.tabs,.btn,header.top .actions,.noprint{display:none!important}body{background:#fff;color:#000}.card{box-shadow:none;break-inside:avoid}}
+.afford{border-radius:14px;padding:14px;margin-top:6px}.afford .verdict{font-weight:800;font-size:18px;margin-bottom:4px}
+.afford.ok{background:var(--good-bg)}.afford.ok .verdict{color:var(--good)}.afford.wait{background:var(--warn-bg)}.afford.wait .verdict{color:var(--warn)}.afford.no{background:var(--bad-bg)}.afford.no .verdict{color:var(--bad)}
+.hbar{display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:center;padding:5px 0}.hbar .lab{font-size:14px;color:var(--muted)}.hbar .trk{height:12px;background:var(--soft);border-radius:999px;overflow:hidden}.hbar .trk i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.chart{width:100%;height:auto;display:block;margin:8px 0}.chart .grid{stroke:var(--line);stroke-width:1}.chart .ax{fill:var(--muted);font-size:12px}.chart .ln1{stroke:var(--accent);stroke-width:3}.chart .ln2{stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5}.chart .b1{fill:var(--bar)}.chart .b2{fill:var(--accent)}
+.legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}.legend span{display:inline-block;width:14px;height:4px;border-radius:2px}.legend .k1{background:var(--accent)}.legend .k2{background:var(--muted)}
+
+.vcard{border-top:1px solid var(--line);padding:12px 0}.vcard:first-of-type{border-top:0}
+.vhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.vhead .t{font-weight:700;font-size:16px}.vhead .s{color:var(--muted);font-size:14px}
+.prow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:6px 0 6px 12px;border-left:3px solid var(--soft);margin:4px 0 4px 2px;font-size:15px}
+.prow.od{border-left-color:var(--bad)}.prow.pd{opacity:.6}.prow .when{color:var(--muted);font-size:13px}
+.mhead{display:flex;justify-content:space-between;font-weight:800;padding:14px 0 4px;border-bottom:2px solid var(--line)}
+.tl td.dt{white-space:nowrap;color:var(--muted)}.tl tr.pay td.am{color:var(--bad)}.tl tr.save td.am,.tl tr.in td.am{color:var(--good)}
+.chart .zero{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}.chart .ln1{fill:none}.chart .area{fill:var(--soft)}.chart .dotp{fill:var(--bad)}
+.crowd{display:inline-flex;gap:6px}
+.rs button{padding:4px 10px;font-size:13px}
+input[type=number]{-moz-appearance:textfield}
+</style></head>
+<body><div class="wrap" id="app"><noscript>This app needs JavaScript enabled in your browser.</noscript></div>
+<script>window.WBA_DEMO=true</script><script>/* Wedding Budget App - calculation engine (no DOM, no storage).
+   Money going IN is dollars (numbers). Money coming OUT is integer cents (fields ending in C, or noted). Dates are ISO strings YYYY-MM-DD. */
+(function (root) {
+  'use strict';
+
+  /* ---------- dates ---------- */
+  function toDays(iso) { var p = iso.split('-'); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function fromDays(n) { var d = new Date(n * 86400000); return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
+  function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function mk(y, m, d) { return y + '-' + pad(m) + '-' + pad(Math.min(d, daysInMonth(y, m))); }
+  function addMonths(iso, k) {
+    var p = iso.split('-'), y = +p[0], m = +p[1], d = +p[2], idx = y * 12 + (m - 1) + k;
+    return mk(Math.floor(idx / 12), (idx % 12 + 12) % 12 + 1, d);
+  }
+  function cents(x) { x = Number(x); if (!isFinite(x)) return 0; return x < 0 ? -Math.round(-x * 100) : Math.round(x * 100); }
+  function ceilDiv(a, b) { return Math.floor((a + b - 1) / b); }
+
+  /* ---------- categories (typical share of a wedding budget) ---------- */
+  var CATS = [
+    { name: 'Venue', pct: 20 }, { name: 'Catering & bar', pct: 25 }, { name: 'Photography & video', pct: 10 }, { name: 'Attire', pct: 8 },
+    { name: 'Flowers & decor', pct: 8 }, { name: 'Music & entertainment', pct: 7 }, { name: 'Cake & desserts', pct: 2 }, { name: 'Rings', pct: 3 },
+    { name: 'Invitations & stationery', pct: 2 }, { name: 'Hair & makeup', pct: 2 }, { name: 'Transportation', pct: 2 }, { name: 'Officiant & license', pct: 1 },
+    { name: 'Favors & gifts', pct: 1 }, { name: 'Other & buffer', pct: 9 }
+  ];
+  var CAT_NAMES = CATS.map(function (c) { return c.name; });
+  function catOf(name) { return CAT_NAMES.indexOf(name) >= 0 ? name : 'Other & buffer'; }
+
+  /* Split a total (in cents) across the categories by their typical share. Exact: the parts always add up to the total. */
+  function splitBudget(totalC) {
+    var out = {}, used = 0, rem = [];
+    CATS.forEach(function (c, i) { var q = Math.floor(totalC * c.pct / 100); out[c.name] = q; used += q; rem.push([(totalC * c.pct) % 100, i]); });
+    rem.sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; });
+    for (var i = 0; i < totalC - used; i++) out[CATS[rem[i][1]].name] += 1;
+    return out;
+  }
+
+  /* ---------- vendors ---------- */
+  function guestCount(state) { var g = Math.floor(Number(state.wedding && state.wedding.guests)); return isFinite(g) && g > 0 ? g : 0; }
+
+  /* v: {id,name,category,status,total,perGuest,payments:[{id,label,amount,due,paid,balance}]}
+     The payment flagged "balance" is whatever is left after the fixed payments. Per-guest vendors scale with the guest count. */
+  function resolveVendor(v, guests) {
+    var total = Number(v.perGuest) > 0 ? cents(v.perGuest) * guests : cents(v.total), fixed = 0, seen = false, pays = [];
+    (v.payments || []).forEach(function (p) { if (!(p.balance && !seen)) fixed += cents(p.amount); if (p.balance) seen = true; });
+    var bal = Math.max(0, total - fixed); seen = false;
+    (v.payments || []).forEach(function (p) {
+      var isBal = !!p.balance && !seen; if (p.balance) seen = true;
+      pays.push({ id: p.id, label: p.label || 'Payment', due: p.due, paid: !!p.paid, balance: isBal, amount: isBal ? bal : cents(p.amount) });
+    });
+    return { id: v.id, name: v.name, category: catOf(v.category), status: v.status === 'considering' ? 'considering' : 'booked', total: total, payments: pays, overpaid: fixed > total };
+  }
+
+  function summary(state, guestsOverride) {
+    var g = guestsOverride === undefined ? guestCount(state) : guestsOverride, budget = cents(state.wedding && state.wedding.budget);
+    var committed = 0, considering = 0, paid = 0, toPay = 0, cats = {}, vend = [];
+    CAT_NAMES.forEach(function (n) { cats[n] = { name: n, budgetC: cents((state.categoryBudgets || {})[n]), committedC: 0, consideringC: 0, remainingC: 0 }; });
+    (state.vendors || []).forEach(function (v) {
+      var r = resolveVendor(v, g); vend.push(r);
+      if (r.status === 'booked') {
+        committed += r.total; cats[r.category].committedC += r.total;
+        r.payments.forEach(function (p) { if (p.paid) paid += p.amount; else toPay += p.amount; });
+      } else { considering += r.total; cats[r.category].consideringC += r.total; }
+    });
+    var list = CAT_NAMES.map(function (n) { cats[n].remainingC = cats[n].budgetC - cats[n].committedC; return cats[n]; });
+    return { guests: g, budgetC: budget, committedC: committed, consideringC: considering, remainingC: budget - committed, paidC: paid, toPayC: toPay,
+      perGuestC: g > 0 ? Math.round(committed / g) : null, perGuestAllC: g > 0 ? Math.round((committed + considering) / g) : null,
+      cats: list, vendors: vend, catBudgetTotalC: list.reduce(function (a, c) { return a + c.budgetC; }, 0) };
+  }
+
+  /* ---------- the savings plan ---------- */
+  function contribDate(today, k) { return addMonths(today, k); }
+  function nContrib(today, d) { var n = 0; while (n < 600 && contribDate(today, n + 1) <= d) n++; return n; }
+
+  /* Money you have available now: everything saved + gifts already received - what has been paid out. */
+  function availableC(state, sm) {
+    var rec = 0; (state.gifts || []).forEach(function (g) { if (g.received) rec += cents(g.amount); });
+    return cents(state.savings && state.savings.saved) + rec - sm.paidC;
+  }
+
+  /* Unpaid payments of booked vendors (overdue ones count as due today) and gifts still to come (past-dated ones count today). */
+  function dueItems(state, today, sm) {
+    var pays = [], inflows = [];
+    sm.vendors.forEach(function (v) {
+      if (v.status !== 'booked') return;
+      v.payments.forEach(function (p) {
+        if (p.paid) return;
+        var due = p.due && /^\d{4}-\d{2}-\d{2}$/.test(p.due) ? p.due : today;
+        pays.push({ date: due > today ? due : today, due: due, overdue: due < today, amount: p.amount, label: v.name + ' - ' + p.label, vendorId: v.id, payId: p.id });
+      });
+    });
+    (state.gifts || []).forEach(function (g) {
+      if (g.received) return;
+      var d = g.date && /^\d{4}-\d{2}-\d{2}$/.test(g.date) ? g.date : today;
+      inflows.push({ date: d > today ? d : today, amount: cents(g.amount), label: g.name || 'Gift' });
+    });
+    return { pays: pays, inflows: inflows };
+  }
+
+  /* The smallest steady monthly saving (first deposit one month from today) so that the money on hand never falls below zero when a payment is due. */
+  function savePlan(state, today, sm) {
+    sm = sm || summary(state);
+    var avail = availableC(state, sm), di = dueItems(state, today, sm), dates = {}, i;
+    di.pays.forEach(function (p) { dates[p.date] = 1; });
+    var list = Object.keys(dates).sort(), monthly = 0, gap = 0, binding = null, gapDate = null;
+    list.forEach(function (d) {
+      var C = 0, I = 0;
+      di.pays.forEach(function (p) { if (p.date <= d) C += p.amount; });
+      di.inflows.forEach(function (x) { if (x.date <= d) I += x.amount; });
+      var need = C - avail - I; if (need <= 0) return;
+      var n = nContrib(today, d);
+      if (n === 0) { if (need > gap) { gap = need; gapDate = d; } }
+      else { var m = ceilDiv(need, n); if (m > monthly) { monthly = m; binding = d; } }
+    });
+    var totalDue = di.pays.reduce(function (a, p) { return a + p.amount; }, 0), inflowTotal = di.inflows.reduce(function (a, x) { return a + x.amount; }, 0);
+    var lastDue = list.length ? list[list.length - 1] : null, firstDue = list.length ? list[0] : null;
+    var planned = cents(state.savings && state.savings.monthly), status = 'none';
+    if (di.pays.length) {
+      if (gap > 0) status = 'short-now';
+      else if (planned > 0) status = planned >= monthly ? 'on-track' : 'short';
+      else status = 'unset';
+    }
+    return { monthlyC: monthly, gapNowC: gap, gapDate: gapDate, bindingDate: binding, availableC: avail, totalDueC: totalDue, inflowsC: inflowTotal,
+      paymentCount: di.pays.length, firstDue: firstDue, lastDue: lastDue, deposits: lastDue ? nContrib(today, lastDue) : 0,
+      plannedC: planned, spareC: planned - monthly, status: status, overdueCount: di.pays.filter(function (p) { return p.overdue; }).length };
+  }
+
+  /* Running savings balance from today when you put aside mC each month. */
+  function timeline(state, today, mC, sm, plan) {
+    sm = sm || summary(state); plan = plan || savePlan(state, today, sm);
+    var di = dueItems(state, today, sm), ev = [], seq = 0;
+    di.inflows.forEach(function (x) { ev.push({ date: x.date, order: 0, seq: seq++, kind: 'in', label: x.label, amount: x.amount }); });
+    di.pays.forEach(function (p) { ev.push({ date: p.date, order: 2, seq: seq++, kind: 'pay', label: p.label, amount: -p.amount, overdue: p.overdue }); });
+    if (mC > 0 && plan.lastDue) { for (var k = 1; k <= plan.deposits; k++) ev.push({ date: contribDate(today, k), order: 1, seq: seq++, kind: 'save', label: 'Your monthly saving', amount: mC }); }
+    ev.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.order - b.order || a.seq - b.seq; });
+    var bal = plan.availableC, min = bal; ev.forEach(function (e) { bal += e.amount; e.balance = bal; if (bal < min) min = bal; });
+    return { startC: plan.availableC, rows: ev, minC: min, endC: bal };
+  }
+
+  /* ---------- calendar ---------- */
+  function calendar(state, today) {
+    var sm = summary(state), out = [];
+    sm.vendors.forEach(function (v) {
+      if (v.status !== 'booked') return;
+      v.payments.forEach(function (p) { out.push({ date: p.due || today, vendor: v.name, vendorId: v.id, payId: p.id, label: p.label, amountC: p.amount, paid: p.paid, overdue: !p.paid && !!p.due && p.due < today }); });
+    });
+    out.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.vendor < b.vendor ? -1 : a.vendor > b.vendor ? 1 : 0); });
+    return out;
+  }
+
+  /* ---------- can we afford this vendor? ---------- */
+  function canAffordVendor(state, today, q) {
+    var tot = cents(q.total), dep = Math.max(0, Math.min(cents(q.deposit || 0), tot)), pays = [];
+    if (dep > 0) pays.push({ id: 'wi-d', label: 'Deposit', amount: dep / 100, due: q.depositDue || today });
+    pays.push({ id: 'wi-b', label: 'Balance', balance: true, due: q.balanceDue || q.depositDue || today });
+    var hv = { id: 'wi', name: q.name || 'This vendor', category: q.category, status: 'booked', total: tot / 100, perGuest: 0, payments: pays };
+    var hs = Object.assign({}, state, { vendors: (state.vendors || []).concat([hv]) });
+    var sb = summary(state), sa = summary(hs), pb = savePlan(state, today, sb), pa = savePlan(hs, today, sa);
+    var cat = catOf(q.category), cb = sb.cats.filter(function (c) { return c.name === cat; })[0], ca = sa.cats.filter(function (c) { return c.name === cat; })[0];
+    var overBudget = sb.budgetC > 0 && sa.committedC > sb.budgetC;
+    var catOver = ca.budgetC > 0 && ca.committedC > ca.budgetC;
+    var savingsShort = pa.plannedC > 0 && (pa.gapNowC > 0 || pa.monthlyC > pa.plannedC);
+    var verdict = overBudget ? 'no' : (catOver || savingsShort) ? 'stretch' : 'yes';
+    return { verdict: verdict, overBudget: overBudget, catOver: catOver, savingsShort: savingsShort, category: cat, totalC: tot, depositC: dep,
+      committedBeforeC: sb.committedC, committedAfterC: sa.committedC, remainingAfterC: sa.remainingC, budgetC: sb.budgetC,
+      catBudgetC: ca.budgetC, catCommittedAfterC: ca.committedC, catRemainingAfterC: ca.remainingC,
+      monthlyBeforeC: pb.monthlyC, monthlyAfterC: pa.monthlyC, monthlyDeltaC: pa.monthlyC - pb.monthlyC, plannedC: pa.plannedC,
+      gapBeforeC: pb.gapNowC, gapAfterC: pa.gapNowC, perGuestBeforeC: sb.perGuestC, perGuestAfterC: sa.perGuestC,
+      perGuestDeltaC: (sb.perGuestC === null || sa.perGuestC === null) ? null : sa.perGuestC - sb.perGuestC };
+  }
+
+  /* ---------- guests ---------- */
+  function guestStats(state) {
+    var r = { invited: 0, yes: 0, no: 0, pending: 0, parties: 0 };
+    (state.guestList || []).forEach(function (g) {
+      var n = Math.max(1, Math.floor(Number(g.count)) || 1); r.invited += n; r.parties += 1;
+      if (g.rsvp === 'yes') r.yes += n; else if (g.rsvp === 'no') r.no += n; else r.pending += n;
+    });
+    r.expected = r.yes + r.pending;
+    return r;
+  }
+
+  /* What if the guest count were different? Per-guest vendors (catering, bar) scale; flat-price vendors do not. */
+  function whatIfGuests(state, g) {
+    var a = summary(state), b = summary(state, g);
+    return { guests: g, committedC: b.committedC, deltaC: b.committedC - a.committedC, perGuestC: b.perGuestC, remainingC: b.remainingC };
+  }
+
+  var api = { toDays: toDays, fromDays: fromDays, addMonths: addMonths, cents: cents, CATS: CATS, CAT_NAMES: CAT_NAMES, catOf: catOf, splitBudget: splitBudget,
+    resolveVendor: resolveVendor, summary: summary, savePlan: savePlan, timeline: timeline, calendar: calendar, canAffordVendor: canAffordVendor,
+    guestStats: guestStats, whatIfGuests: whatIfGuests, availableC: availableC, mk: mk };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.WBA = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>/* Wedding Budget App - interface. Depends on WBA (engine.js). */
+(function () {
+  'use strict';
+  var E = window.WBA, DEMO = !!window.WBA_DEMO;
+  var KEY = DEMO ? 'wba_demo_v1' : 'wba_budget_v1';
+  var S, page = 'plan', storageOK = true, affordQ = null, showAllTl = false, openV = {}, whatIfG = null;
+
+  /* ---------- helpers ---------- */
+  function uid() { return 'x' + Math.random().toString(36).slice(2, 9); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function todayIso() {
+    var q = /[?&]today=(\d{4}-\d{2}-\d{2})/.exec(location.search); if (q) return q[1];
+    var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function cur() { return S && S.settings.currency || '$'; }
+  function mc(c, signed) { /* money from cents */
+    var neg = c < 0, a = Math.abs(c), whole = Math.floor(a / 100), cc = a % 100;
+    var s = whole.toLocaleString('en-US') + (cc ? '.' + pad(cc) : '');
+    return (neg ? '−' : (signed && c > 0 ? '+' : '')) + cur() + s;
+  }
+  function mc2(c) { var neg = c < 0, a = Math.abs(c); return (neg ? '−' : '') + cur() + Math.floor(a / 100).toLocaleString('en-US') + '.' + pad(a % 100); }
+  function dlabel(iso, long) {
+    if (!iso) return 'no date'; var p = iso.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    return d.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: long ? 'long' : undefined, month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function mlabel(iso) { var p = iso.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1, 1)); return d.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', year: 'numeric' }); }
+  function num(v) { var n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; }
+  function round2(x) { return Math.round(x * 100) / 100; }
+  function validDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s)); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function addDays(iso, n) { return E.fromDays(E.toDays(iso) + n); }
+
+  /* ---------- state ---------- */
+  function blank() {
+    return { app: 'wedding-budget', version: 1, settings: { theme: 'blush', currency: '$' }, wedding: { date: '', guests: 0, budget: 0, names: '' },
+      savings: { saved: 0, monthly: 0 }, categoryBudgets: {}, vendors: [], gifts: [], guestList: [] };
+  }
+  function normalize(o) {
+    var b = blank(), k;
+    if (!o || typeof o !== 'object' || o.app !== 'wedding-budget') throw new Error('This is not a Wedding Budget backup file.');
+    for (k in b) if (o[k] !== undefined) b[k] = o[k];
+    ['vendors', 'gifts', 'guestList'].forEach(function (a) { if (!Array.isArray(b[a])) throw new Error('The backup file is damaged (' + a + ').'); });
+    b.settings = Object.assign({ theme: 'blush', currency: '$' }, b.settings || {});
+    b.wedding = Object.assign({ date: '', guests: 0, budget: 0, names: '' }, b.wedding || {});
+    b.savings = Object.assign({ saved: 0, monthly: 0 }, b.savings || {});
+    if (typeof b.categoryBudgets !== 'object' || b.categoryBudgets === null) b.categoryBudgets = {};
+    b.vendors.forEach(function (v) { if (!Array.isArray(v.payments)) v.payments = []; });
+    return b;
+  }
+  function load() {
+    try { var raw = localStorage.getItem(KEY); if (raw) return normalize(JSON.parse(raw)); } catch (e) { if (e && e.name === 'SecurityError') storageOK = false; }
+    return blank();
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); storageOK = true; } catch (e) { storageOK = false; } }
+
+  /* ---------- example data ---------- */
+  function exampleData() {
+    var t = todayIso(), ex = blank(), wd = addDays(t, 300);
+    ex.wedding = { date: wd, guests: 110, budget: 30000, names: '' };
+    ex.savings = { saved: 5200, monthly: 1800 };
+    ex.categoryBudgets = { 'Venue': 8000, 'Catering & bar': 9200, 'Photography & video': 3300, 'Attire': 2000, 'Flowers & decor': 1700, 'Music & entertainment': 1900, 'Cake & desserts': 500, 'Rings': 600, 'Invitations & stationery': 300, 'Hair & makeup': 400, 'Transportation': 300, 'Officiant & license': 300, 'Favors & gifts': 150, 'Other & buffer': 1350 };
+    function P(label, amount, due, paid, bal) { var p = { id: uid(), label: label, amount: amount, due: due, paid: !!paid }; if (bal) { p.balance = true; p.amount = 0; } return p; }
+    function V(name, cat, status, total, perGuest, pays) { return { id: uid(), name: name, category: cat, status: status, total: total, perGuest: perGuest || 0, payments: pays }; }
+    ex.vendors = [
+      V('Rosewood Barn (venue)', 'Venue', 'booked', 7800, 0, [P('Deposit', 2000, addDays(t, -60), true), P('Second payment', 2000, addDays(t, 90)), P('Final balance', 0, addDays(wd, -30), false, true)]),
+      V('Olive & Thyme Catering', 'Catering & bar', 'booked', 0, 82, [P('Deposit', 1500, addDays(t, 30)), P('Final balance', 0, addDays(wd, -14), false, true)]),
+      V('Lena Park Photography', 'Photography & video', 'booked', 3200, 0, [P('Retainer', 800, addDays(t, -20), true), P('Final balance', 0, addDays(wd, -30), false, true)]),
+      V('The Wedding Dress Shop', 'Attire', 'booked', 1900, 0, [P('Deposit', 950, addDays(t, -10), true), P('Final balance', 0, addDays(t, 120), false, true)]),
+      V('DJ Marcus', 'Music & entertainment', 'booked', 1800, 0, [P('Deposit', 400, addDays(t, 45)), P('Final balance', 0, addDays(wd, -14), false, true)]),
+      V('Sweet Layers Bakery', 'Cake & desserts', 'booked', 450, 0, [P('Deposit', 150, addDays(t, 60)), P('Final balance', 0, addDays(wd, -7), false, true)]),
+      V('Bloom Florist', 'Flowers & decor', 'considering', 1600, 0, [P('Deposit', 400, addDays(t, 50)), P('Final balance', 0, addDays(wd, -10), false, true)]),
+      V('Officiant (friend of the family)', 'Officiant & license', 'considering', 300, 0, [P('Full payment', 300, addDays(wd, -7))])
+    ];
+    ex.gifts = [{ id: uid(), name: 'Parents', amount: 3000, date: addDays(t, 120), received: false }, { id: uid(), name: 'Aunt Carol', amount: 500, date: addDays(t, -14), received: true }];
+    var gl = [['Smith family', 4, 'yes'], ['Johnson family', 3, 'yes'], ['College friends', 8, 'pending'], ['Work friends', 6, 'pending'], ['Grandparents', 4, 'yes'], ['Cousins (Lee)', 5, 'pending'], ['Neighbors', 2, 'no'], ['Aunts and uncles', 10, 'yes'], ['Bridal party', 12, 'yes'], ['Family friends', 14, 'pending']];
+    ex.guestList = gl.map(function (g) { return { id: uid(), name: g[0], count: g[1], rsvp: g[2] }; });
+    return ex;
+  }
+
+  /* ---------- modal + form bits ---------- */
+  function openModal(title, body, onOk, okText) {
+    closeModal();
+    var o = document.createElement('div'); o.className = 'ovl'; o.id = 'ovl';
+    o.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><h2>' + esc(title) + '</h2><form id="mform">' + body +
+      '<div class="actions" style="margin-top:8px;justify-content:flex-end"><button type="button" class="btn" data-act="closeModal">Cancel</button>' +
+      (onOk ? '<button type="submit" class="btn primary">' + esc(okText || 'Save') + '</button>' : '') + '</div></form></div>';
+    document.body.appendChild(o);
+    var f = o.querySelector('input,select'); if (f) f.focus();
+    o.addEventListener('mousedown', function (e) { if (e.target === o) closeModal(); });
+    o.querySelector('#mform').addEventListener('submit', function (e) {
+      e.preventDefault(); if (!onOk) return;
+      var data = {}; new FormData(e.target).forEach(function (v, k) { data[k] = v; });
+      var err = onOk(data); if (err) { var n = o.querySelector('.banner'); if (!n) { n = document.createElement('div'); n.className = 'banner'; e.target.insertBefore(n, e.target.firstChild); } n.textContent = err; } else closeModal();
+    });
+  }
+  function closeModal() { var o = document.getElementById('ovl'); if (o) o.remove(); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  function fld(k, label, v, type, extra) { return '<div class="field"><label for="f_' + k + '">' + label + '</label><input id="f_' + k + '" name="' + k + '" type="' + (type || 'text') + '" value="' + esc(v == null ? '' : v) + '" ' + (extra || '') + '></div>'; }
+  function sel(k, label, opts, v) {
+    return '<div class="field"><label for="f_' + k + '">' + label + '</label><select id="f_' + k + '" name="' + k + '">' + opts.map(function (o) {
+      var val = Array.isArray(o) ? o[0] : o, lab = Array.isArray(o) ? o[1] : o; return '<option value="' + esc(val) + '"' + (String(val) === String(v) ? ' selected' : '') + '>' + esc(lab) + '</option>'; }).join('') + '</select></div>';
+  }
+  function confirmBox(title, text, yes, fn) { openModal(title, '<p>' + esc(text) + '</p>', function () { fn(); return null; }, yes); }
+  var MONEY = 'min="0" step="0.01" inputmode="decimal"';
+  function vendorById(id) { return S.vendors.filter(function (v) { return v.id === id; })[0]; }
+
+  /* ---------- editors ---------- */
+  function editVendor(id) {
+    editVendor.warned = false;
+    var v = id ? vendorById(id) : null, d0 = addDays(todayIso(), 14), bd = S.wedding.date ? addDays(S.wedding.date, -30) : addDays(todayIso(), 180);
+    var body = fld('name', 'Vendor name', v ? v.name : '', 'text', 'required maxlength="60" placeholder="e.g. Rosewood Barn"') + sel('category', 'Category', E.CAT_NAMES, v ? E.catOf(v.category) : 'Venue') +
+      sel('status', 'Status', [['booked', 'Booked (contract signed)'], ['considering', 'Still considering']], v ? v.status : 'booked') +
+      sel('mode', 'The price is', [['total', 'A total price'], ['guest', 'A price per guest']], v && v.perGuest > 0 ? 'guest' : 'total') +
+      fld('price', 'Price (total, or per guest)', v ? (v.perGuest > 0 ? v.perGuest : v.total) : '', 'number', 'required ' + MONEY);
+    if (!v) body += '<p class="note">Payments: most vendors want a deposit now and the rest later. You can add more payments afterwards.</p>' + fld('deposit', 'Deposit amount (0 if none)', '', 'number', MONEY) + fld('depositDue', 'Deposit due', d0, 'date') + fld('balanceDue', 'Final balance due', bd, 'date', 'required');
+    openModal(v ? 'Edit vendor' : 'Add a vendor', body, function (d) {
+      var price = num(d.price); if (!(price > 0)) return 'Enter a price above zero.';
+      if (!v && !validDate(d.balanceDue)) return 'Pick the date the final balance is due.';
+      var dep = v ? 0 : num(d.deposit); if (!v && dep > 0 && !validDate(d.depositDue)) return 'Pick the date the deposit is due.';
+      if (!v && dep > 0 && d.balanceDue < d.depositDue) return 'The final balance date is before the deposit date. Please check the years.';
+      if (!v && d.balanceDue < todayIso() && !editVendor.warned) { editVendor.warned = true; return 'The final balance date is in the past. Did you mean a later year? Change it, or press Save again to keep it.'; }
+      editVendor.warned = false;
+      var obj = v || { id: uid(), payments: [] };
+      obj.name = d.name.trim() || 'Vendor'; obj.category = d.category; obj.status = d.status;
+      if (d.mode === 'guest') { obj.perGuest = round2(price); obj.total = 0; } else { obj.perGuest = 0; obj.total = round2(price); }
+      if (!v) {
+        var total = obj.perGuest > 0 ? obj.perGuest * Math.max(0, +S.wedding.guests || 0) : obj.total;
+        if (dep > 0 && obj.perGuest === 0 && dep > total) return 'The deposit is more than the total price.';
+        if (dep > 0) obj.payments.push({ id: uid(), label: 'Deposit', amount: round2(dep), due: d.depositDue, paid: false });
+        obj.payments.push({ id: uid(), label: 'Final balance', amount: 0, due: d.balanceDue, paid: false, balance: true });
+        S.vendors.push(obj); openV[obj.id] = true;
+      }
+      save(); render(); return null;
+    });
+  }
+  function editPayment(vid, pid) {
+    var v = vendorById(vid); if (!v) return; var p = pid ? v.payments.filter(function (x) { return x.id === pid; })[0] : null;
+    var body = fld('label', 'What is this payment?', p ? p.label : '', 'text', 'required maxlength="40" placeholder="e.g. Second installment"') + fld('due', 'Due date', p ? p.due : addDays(todayIso(), 30), 'date', 'required');
+    if (p && p.balance) body += '<p class="note">This is the final balance: it is whatever is left after the other payments, so its amount updates by itself.</p>';
+    else body += fld('amount', 'Amount', p ? p.amount : '', 'number', 'required ' + MONEY);
+    openModal(p ? 'Edit payment' : 'Add a payment', body, function (d) {
+      if (!validDate(d.due)) return 'Pick a due date.';
+      if (!(p && p.balance)) { var a = num(d.amount); if (!(a > 0)) return 'Enter an amount above zero.'; }
+      var o = p || { id: uid(), paid: false }; o.label = d.label.trim() || 'Payment'; o.due = d.due; if (!(p && p.balance)) o.amount = round2(num(d.amount));
+      if (!p) { var hasBal = v.payments.some(function (x) { return x.balance; }); if (hasBal) v.payments.splice(v.payments.length - 1, 0, o); else v.payments.push(o); }
+      save(); render(); return null;
+    });
+  }
+  function editGift(id) {
+    var g = id ? S.gifts.filter(function (x) { return x.id === id; })[0] : null;
+    openModal(g ? 'Edit gift' : 'Add money coming in', '<p class="note">Money family or friends are giving toward the wedding. It counts as savings from its date, which lowers the monthly amount you need.</p>' +
+      fld('name', 'From whom', g ? g.name : '', 'text', 'required maxlength="40" placeholder="e.g. Parents"') + fld('amount', 'Amount', g ? g.amount : '', 'number', 'required ' + MONEY) + fld('date', 'Expected on', g ? g.date : addDays(todayIso(), 60), 'date', 'required'), function (d) {
+      var a = num(d.amount); if (!(a > 0)) return 'Enter an amount above zero.'; if (!validDate(d.date)) return 'Pick a date.';
+      var o = g || { id: uid(), received: false }; o.name = d.name.trim() || 'Gift'; o.amount = round2(a); o.date = d.date; if (!g) S.gifts.push(o); save(); render(); return null;
+    });
+  }
+  function editGuest(id) {
+    var g = id ? S.guestList.filter(function (x) { return x.id === id; })[0] : null;
+    openModal(g ? 'Edit guest or party' : 'Add a guest or party', fld('name', 'Name (or family / group)', g ? g.name : '', 'text', 'required maxlength="50"') + fld('count', 'How many people', g ? g.count : 1, 'number', 'required min="1" max="500" step="1" inputmode="numeric"') +
+      sel('rsvp', 'Answer', [['pending', 'No answer yet'], ['yes', 'Coming'], ['no', 'Not coming']], g ? g.rsvp : 'pending'), function (d) {
+      var n = Math.floor(num(d.count)); if (n < 1) return 'At least 1 person.'; var o = g || { id: uid() }; o.name = d.name.trim() || 'Guest'; o.count = n; o.rsvp = d.rsvp; if (!g) S.guestList.push(o); save(); render(); return null;
+    });
+  }
+
+  /* ---------- shared view bits ---------- */
+  function ctx() { var t = todayIso(), sm = E.summary(S), plan = E.savePlan(S, t, sm); return { t: t, sm: sm, plan: plan }; }
+  function tabsNote() { return ''; }
+  function statusPill(plan) {
+    if (plan.status === 'on-track') return '<span class="pill good">On track · ' + mc(plan.spareC) + ' a month to spare</span>';
+    if (plan.status === 'short') return '<span class="pill warn">' + mc(-plan.spareC) + ' a month short of your plan</span>';
+    if (plan.status === 'short-now') return '<span class="pill bad">Cash needed before your first deposit</span>';
+    if (plan.status === 'unset') return '<span class="pill mute">Tell the app what you can save a month in Setup</span>';
+    return '';
+  }
+  function balanceChart(tl, today) {
+    var W = 640, H = 230, L = 58, R = 12, T = 14, B = 30, pw = W - L - R, ph = H - T - B, rows = tl.rows; if (!rows.length) return '';
+    var d0 = E.toDays(today), dN = Math.max(d0 + 30, E.toDays(rows[rows.length - 1].date)), span = dN - d0, lo = Math.min(0, tl.minC), hi = Math.max(tl.startC, 1);
+    rows.forEach(function (r) { if (r.balance > hi) hi = r.balance; });
+    var STEPS = [100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000, 100000, 250000, 500000], stepD = 500000;
+    for (var si = 0; si < STEPS.length; si++) { if ((hi - lo) / 100 / STEPS[si] <= 4) { stepD = STEPS[si]; break; } }
+    var stepC = stepD * 100; lo = Math.floor(lo / stepC) * stepC; hi = Math.ceil(hi / stepC) * stepC; var rng = hi - lo;
+    function X(d) { return L + (E.toDays(d) - d0) / span * pw; } function Y(c) { return T + ph - (c - lo) / rng * ph; }
+    var pts = [[0, tl.startC]], prev = tl.startC, markers = [];
+    rows.forEach(function (r) { var x = X(r.date); pts.push([x - L, prev]); pts.push([x - L, r.balance]); prev = r.balance; if (r.kind === 'pay') markers.push([x, Y(r.balance)]); });
+    pts.push([pw, prev]);
+    var path = pts.map(function (p, i) { return (i ? 'L' : 'M') + (L + p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join('');
+    var s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Your savings balance over time. Dots mark vendor payments.">';
+    for (var tc = lo; tc <= hi; tc += stepC) { var ty = Y(tc); s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + ty + '" y2="' + ty + '" class="grid"/><text x="' + (L - 6) + '" y="' + (ty + 4) + '" class="ax" text-anchor="end">' + mc(tc) + '</text>'; }
+    if (lo < 0) s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" class="zero"/>';
+    var months = Math.max(1, Math.round(span / 30)), step = Math.max(1, Math.ceil(months / 6));
+    for (var k = 0; k <= months; k += step) { var di = E.addMonths(today, k); if (E.toDays(di) > dN) break; s += '<text x="' + X(di) + '" y="' + (H - 8) + '" class="ax" text-anchor="middle">' + new Date(Date.UTC(+di.slice(0, 4), +di.slice(5, 7) - 1, 1)).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', year: '2-digit' }) + '</text>'; }
+    s += '<path d="' + path + '" class="ln1" />';
+    markers.forEach(function (m) { s += '<circle cx="' + m[0].toFixed(1) + '" cy="' + m[1].toFixed(1) + '" r="4.5" class="dotp"/>'; });
+    return s + '</svg><div class="legend"><span class="k1"></span> your savings balance &nbsp; <b style="color:var(--bad)">●</b> a vendor payment</div>';
+  }
+
+  /* ---------- pages ---------- */
+  function setupSteps(c) {
+    var items = [['Tell the app about your wedding (date, guests, total budget)', S.wedding.budget > 0], ['Enter what you have saved so far and what you can save each month', S.savings.saved > 0 || S.savings.monthly > 0], ['Add your vendors and when each payment is due', S.vendors.length > 0]];
+    return '<div class="card"><h2>Three quick steps to your plan</h2><ol class="steps">' + items.map(function (i) { return '<li' + (i[1] ? ' class="done"' : '') + '>' + i[0] + '</li>'; }).join('') + '</ol>' +
+      '<div class="actions"><button class="btn primary" data-nav="setup">1 and 2: Open Setup</button><button class="btn primary" data-act="addVendor">3: Add a vendor</button><button class="btn" data-act="loadExample">See it with example data</button></div></div>';
+  }
+  function pagePlan() {
+    var c = ctx(), plan = c.plan, sm = c.sm, h = '', tl;
+    if (plan.availableC < 0) h += '<div class="banner">You have recorded more paid to vendors than you have saved. In <b>Setup</b>, make “Saved so far” include everything you have put toward the wedding, including money already paid out.</div>';
+    if (plan.overdueCount) h += '<div class="banner">' + plural(plan.overdueCount, 'payment') + ' past due. They are counted as due today in your plan.</div>';
+    if (!S.vendors.length && !(S.wedding.budget > 0)) return h + setupSteps(c) + pageHowTail();
+    var days = S.wedding.date && validDate(S.wedding.date) ? E.toDays(S.wedding.date) - E.toDays(c.t) : null;
+    if (plan.status === 'none') {
+      h += '<div class="card hero"><div class="label">Your savings plan</div><div class="big">Add a vendor</div><div class="sub">Add your booked vendors and when each payment is due. The app then tells you exactly how much to put aside every month.</div><div class="actions" style="justify-content:center;margin-top:12px"><button class="btn primary" data-act="addVendor">Add a vendor</button></div></div>';
+    } else {
+      tl = E.timeline(S, c.t, plan.monthlyC, sm, plan);
+      h += '<div class="card hero"><div class="label">So every vendor payment is covered, put aside</div><div class="big">' + (plan.monthlyC > 0 ? mc(plan.monthlyC) + ' <span style="font-size:22px;font-weight:700">a month</span>' : (plan.gapNowC > 0 ? mc(plan.gapNowC) : mc(0))) + '</div>' +
+        '<div class="sub">' + (plan.monthlyC > 0 ? plural(plan.deposits, 'monthly deposit') + ' from today until ' + dlabel(plan.lastDue) + (plan.bindingDate ? '. The tightest point is ' + dlabel(plan.bindingDate) + '.' : '.') : (plan.gapNowC > 0 ? 'needed now, before your first monthly deposit' : 'You already have enough set aside for every payment.')) + '</div>' +
+        (plan.gapNowC > 0 ? '<div class="sub" style="margin-top:6px"><b>' + mc(plan.gapNowC) + '</b> must be on hand by ' + dlabel(plan.gapDate) + ', before your first monthly deposit' + (plan.monthlyC > 0 ? ', then ' + mc(plan.monthlyC) + ' a month.' : '.') + '</div>' : '') +
+        '<div style="margin-top:10px">' + statusPill(plan) + '</div>' + (days !== null && days >= 0 ? '<div class="sub" style="margin-top:6px">' + plural(days, 'day') + ' to go until ' + dlabel(S.wedding.date, true) + '</div>' : '') + '</div>';
+    }
+    var over = sm.budgetC > 0 && sm.remainingC < 0;
+    h += '<div class="grid g3" style="margin-bottom:14px"><div class="card stat" style="margin:0"><div class="v">' + (sm.budgetC > 0 ? mc(sm.budgetC) : '—') + '</div><div class="l">Total budget</div></div>' +
+      '<div class="card stat" style="margin:0"><div class="v">' + mc(sm.committedC) + '</div><div class="l">Booked so far' + (sm.consideringC ? ' (' + mc(sm.consideringC) + ' more being considered)' : '') + '</div></div>' +
+      '<div class="card stat" style="margin:0"><div class="v ' + (over ? 'neg' : '') + '">' + (sm.budgetC > 0 ? mc(sm.remainingC) : '—') + '</div><div class="l">' + (over ? 'Over budget' : 'Left to commit') + (sm.perGuestC !== null ? ' · ' + mc(sm.perGuestC) + ' per guest so far' : '') + '</div></div></div>';
+    var cal = E.calendar(S, c.t).filter(function (x) { return !x.paid; }).slice(0, 4);
+    if (cal.length) h += '<div class="card"><h2>Next payments</h2>' + cal.map(function (x) { return '<div class="row"><div class="main"><div class="t">' + esc(x.vendor) + ' · ' + esc(x.label) + '</div><div class="s">' + (x.overdue ? '<span class="pill bad">Past due</span> ' : '') + 'Due ' + dlabel(x.date) + '</div></div><div class="amt">' + mc(x.amountC) + '</div><button class="btn small primary" data-act="markPaid" data-id="' + x.vendorId + '" data-pid="' + x.payId + '">Mark paid</button></div>'; }).join('') + '</div>';
+    if (tl) {
+      h += '<div class="card"><h2>Your savings, month by month</h2>' + balanceChart(tl, c.t) + '<p class="note">The line never drops below zero: that is what “covered” means.</p>' +
+        '<details><summary>Show the math</summary><div class="math">' +
+        '<div><span>Saved so far</span><span>' + mc(E.cents(S.savings.saved)) + '</span></div>' +
+        (sm.paidC ? '<div><span>− Already paid to vendors</span><span>' + mc(sm.paidC) + '</span></div>' : '') +
+        (plan.availableC !== E.cents(S.savings.saved) - sm.paidC ? '<div><span>+ Gifts already received</span><span>' + mc(plan.availableC - (E.cents(S.savings.saved) - sm.paidC)) + '</span></div>' : '') +
+        '<div class="tot"><span>= Set aside right now</span><span>' + mc(plan.availableC) + '</span></div>' +
+        '<div><span>Vendor payments still to come (' + plan.paymentCount + ')</span><span>' + mc(plan.totalDueC) + '</span></div>' +
+        (plan.inflowsC ? '<div><span>Gifts still expected</span><span>' + mc(plan.inflowsC) + '</span></div>' : '') +
+        '<div class="tot"><span>You still need to save at least</span><span>' + mc(Math.max(0, plan.totalDueC - plan.availableC - plan.inflowsC)) + '</span></div>' +
+        '<div><span>Spread over ' + plural(plan.deposits, 'monthly deposit') + ', front-loaded where payments come early</span><span>' + mc(plan.monthlyC) + ' each</span></div></div>' +
+        '<p class="note">The monthly amount is the smallest one that keeps your balance at or above zero on every payment date, not just the average. Deposits are counted on the same day of the month as today.</p>' +
+        '<h3>Every deposit and payment</h3>' + tlTable(tl) + '</details></div>';
+    }
+    return h + pageHowTail();
+  }
+  function tlTable(tl) {
+    var rows = tl.rows, show = showAllTl ? rows : rows.slice(0, 12);
+    return '<table class="tl"><thead><tr><th>Date</th><th>What</th><th class="r">Amount</th><th class="r">Savings after</th></tr></thead><tbody>' +
+      '<tr><td class="dt">Today</td><td>Set aside right now</td><td class="r am"></td><td class="r">' + mc(tl.startC) + '</td></tr>' +
+      show.map(function (r) { return '<tr class="' + r.kind + '"><td class="dt">' + dlabel(r.date) + '</td><td>' + esc(r.label) + '</td><td class="r am">' + mc(r.amount, true) + '</td><td class="r ' + (r.balance < 0 ? 'neg' : '') + '">' + mc(r.balance) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      (rows.length > 12 ? '<div class="actions" style="margin-top:8px"><button class="btn small" data-act="toggleTl">' + (showAllTl ? 'Show fewer' : 'Show all ' + rows.length + ' rows') + '</button></div>' : '');
+  }
+  function pageHowTail() { return '<p class="note" style="text-align:center">Your data stays on this device. Nothing is uploaded.</p>'; }
+
+  function vendorRow(v, rv, t) {
+    var open = !!openV[v.id], paidN = rv.payments.filter(function (p) { return p.paid; }).length;
+    var next = rv.payments.filter(function (p) { return !p.paid; }).sort(function (a, b) { return (a.due || '') < (b.due || '') ? -1 : 1; })[0];
+    var h = '<div class="vcard"><div class="vhead"><div><div class="t">' + esc(v.name) + (v.perGuest > 0 ? '<span class="tag">' + mc(E.cents(v.perGuest)) + ' per guest</span>' : '') + '</div><div class="s">' + esc(rv.category) + ' · ' + mc(rv.total) + ' total' +
+      (rv.payments.length ? ' · ' + paidN + ' of ' + rv.payments.length + ' payments made' : '') + (next && rv.status === 'booked' ? ' · next ' + dlabel(next.due) : '') + '</div></div>' +
+      '<div class="actions"><button class="btn small" data-act="toggleV" data-id="' + v.id + '" aria-expanded="' + open + '">' + (open ? 'Hide payments' : 'Payments') + '</button><button class="btn small" data-act="editVendor" data-id="' + v.id + '">Edit</button>' +
+      (rv.status === 'considering' ? '<button class="btn small primary" data-act="bookV" data-id="' + v.id + '">Mark booked</button>' : '') + '<button class="btn small danger" data-act="delVendor" data-id="' + v.id + '">Delete</button></div></div>';
+    if (rv.overpaid) h += '<div class="banner" style="margin-top:8px">The fixed payments add up to more than the total price. Check the amounts.</div>';
+    if (open) {
+      h += rv.payments.map(function (p) {
+        var od = !p.paid && p.due && p.due < t;
+        return '<div class="prow' + (p.paid ? ' pd' : '') + (od ? ' od' : '') + '"><div><b>' + esc(p.label) + '</b> <span class="when">' + dlabel(p.due) + (od ? ' · past due' : '') + (p.balance ? ' · rest of the price' : '') + '</span></div><div class="amt">' + mc(p.amount) + '</div>' +
+          '<div class="actions">' + (rv.status === 'booked' ? (p.paid ? '<button class="btn small" data-act="unpaid" data-id="' + v.id + '" data-pid="' + p.id + '">Paid ✓ Undo</button>' : '<button class="btn small primary" data-act="markPaid" data-id="' + v.id + '" data-pid="' + p.id + '">Mark paid</button>') : '') +
+          '<button class="btn small" data-act="editPay" data-id="' + v.id + '" data-pid="' + p.id + '">Edit</button><button class="btn small danger" data-act="delPay" data-id="' + v.id + '" data-pid="' + p.id + '" aria-label="Delete payment">✕</button></div></div>';
+      }).join('') + '<div class="actions" style="margin:6px 0 0 14px"><button class="btn small" data-act="addPay" data-id="' + v.id + '">+ Add a payment</button></div>';
+    }
+    return h + '</div>';
+  }
+  function pageVendors() {
+    var c = ctx(), h = '<div class="card"><div class="row" style="border:0;padding:0"><div class="main"><h2 style="margin:0">Vendors</h2><div class="s">' + mc(c.sm.committedC) + ' booked' + (c.sm.consideringC ? ' · ' + mc(c.sm.consideringC) + ' being considered' : '') + '</div></div><button class="btn primary" data-act="addVendor">+ Add a vendor</button></div></div>';
+    ['booked', 'considering'].forEach(function (st) {
+      var list = S.vendors.map(function (v, i) { return [v, c.sm.vendors[i]]; }).filter(function (x) { return x[1].status === st; });
+      if (!list.length) return;
+      h += '<div class="card"><h2>' + (st === 'booked' ? 'Booked' : 'Still considering') + '</h2>' + (st === 'considering' ? '<p class="note">These are not in your savings plan until you mark them booked.</p>' : '') + list.map(function (x) { return vendorRow(x[0], x[1], c.t); }).join('') + '</div>';
+    });
+    if (!S.vendors.length) h += '<div class="card empty">No vendors yet. Add your venue first: it is usually the biggest payment.</div>';
+    return h;
+  }
+  function pageCalendar() {
+    var c = ctx(), cal = E.calendar(S, c.t), h = '<div class="card"><h2>Payment calendar</h2><p class="note">Every vendor payment, in date order, for vendors you have booked.</p>';
+    if (!cal.length) return h + '<div class="empty">No payments yet. Add a booked vendor with its payment dates.</div></div>';
+    var groups = {}, order = []; cal.forEach(function (x) { var k = x.date.slice(0, 7); if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(x); });
+    order.forEach(function (k) {
+      var tot = groups[k].reduce(function (a, x) { return a + (x.paid ? 0 : x.amountC); }, 0);
+      h += '<div class="mhead"><span>' + mlabel(k + '-01') + '</span><span>' + (tot ? mc(tot) + ' to pay' : 'all paid') + '</span></div>' + groups[k].map(function (x) {
+        return '<div class="row"><div class="main"><div class="t">' + esc(x.vendor) + ' · ' + esc(x.label) + '</div><div class="s">' + dlabel(x.date) + (x.overdue ? ' <span class="pill bad">Past due</span>' : '') + (x.paid ? ' <span class="pill good">Paid</span>' : '') + '</div></div><div class="amt">' + mc(x.amountC) + '</div>' +
+          (x.paid ? '<button class="btn small" data-act="unpaid" data-id="' + x.vendorId + '" data-pid="' + x.payId + '">Undo</button>' : '<button class="btn small primary" data-act="markPaid" data-id="' + x.vendorId + '" data-pid="' + x.payId + '">Mark paid</button>') + '</div>';
+      }).join('');
+    });
+    var tot = cal.reduce(function (a, x) { return a + x.amountC; }, 0), paid = cal.reduce(function (a, x) { return a + (x.paid ? x.amountC : 0); }, 0);
+    return h + '<div class="math" style="margin-top:12px"><div><span>All payments</span><span>' + mc(tot) + '</span></div><div><span>Already paid</span><span>' + mc(paid) + '</span></div><div class="tot"><span>Still to pay</span><span>' + mc(tot - paid) + '</span></div></div></div>';
+  }
+  function pageBudget() {
+    var c = ctx(), sm = c.sm, h = '', allocated = sm.catBudgetTotalC;
+    h += '<div class="card"><h2>Budget by category</h2><div class="grid g3"><div class="stat"><div class="v">' + (sm.budgetC > 0 ? mc(sm.budgetC) : '—') + '</div><div class="l">Total budget</div></div><div class="stat"><div class="v">' + mc(sm.committedC) + '</div><div class="l">Booked</div></div><div class="stat"><div class="v ' + (sm.budgetC > 0 && sm.remainingC < 0 ? 'neg' : '') + '">' + (sm.budgetC > 0 ? mc(sm.remainingC) : '—') + '</div><div class="l">' + (sm.remainingC < 0 && sm.budgetC > 0 ? 'Over budget' : 'Left') + '</div></div></div>' +
+      '<div class="actions" style="margin:12px 0"><button class="btn primary" data-act="suggestSplit">Suggest a split of my budget</button><button class="btn" data-nav="setup">Change total budget</button></div>' +
+      (sm.budgetC > 0 && allocated !== sm.budgetC && allocated > 0 ? '<p class="note">Your category amounts add up to ' + mc(allocated) + ' (' + (allocated < sm.budgetC ? mc(sm.budgetC - allocated) + ' not yet given to a category' : mc(allocated - sm.budgetC) + ' more than your total budget') + ').</p>' : '') +
+      '<table><thead><tr><th>Category</th><th class="r">Budget</th><th class="r">Booked</th><th class="r">Left</th></tr></thead><tbody>' + sm.cats.map(function (k) {
+        var pct = k.budgetC > 0 ? Math.min(100, Math.round(k.committedC / k.budgetC * 100)) : 0, over = k.budgetC > 0 && k.committedC > k.budgetC;
+        return '<tr><td>' + esc(k.name) + (k.consideringC ? '<div class="note">+' + mc(k.consideringC) + ' considering</div>' : '') + (k.budgetC > 0 ? '<div class="bar' + (over ? ' over' : '') + '" style="margin-top:4px;max-width:180px"><i style="width:' + pct + '%"></i></div>' : '') + '</td><td class="r"><input type="number" data-catbudget="' + esc(k.name) + '" value="' + (k.budgetC ? k.budgetC / 100 : '') + '" ' + MONEY + ' aria-label="Budget for ' + esc(k.name) + '" placeholder="0"></td><td class="r">' + mc(k.committedC) + '</td><td class="r ' + (k.budgetC > 0 && k.remainingC < 0 ? 'neg' : '') + '">' + (k.budgetC > 0 ? mc(k.remainingC) : '—') + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    h += '<div class="card"><h2>Cost per guest</h2>' + (sm.guests > 0 ? '<div class="grid g3"><div class="stat"><div class="v">' + mc(sm.perGuestC) + '</div><div class="l">Booked so far, per guest</div></div><div class="stat"><div class="v">' + mc(sm.perGuestAllC) + '</div><div class="l">If you book everything you are considering</div></div><div class="stat"><div class="v">' + sm.guests + '</div><div class="l">Guests planned</div></div></div>' : '<div class="empty">Enter your guest count in Setup or on the Guests page to see the cost per guest.</div>') + '</div>';
+    return h;
+  }
+  function pageAfford() {
+    var c = ctx(), q = affordQ, h = '', t = c.t, d0 = addDays(t, 14), bd = S.wedding.date ? addDays(S.wedding.date, -30) : addDays(t, 180);
+    h += '<div class="card"><h2>Can we afford this vendor?</h2><p class="note">Thinking about a quote? Enter it here. You will see what it does to your budget and to your monthly saving before you sign anything.</p>' +
+      '<form data-form="afford" autocomplete="off"><div class="grid g2"><div class="field"><label for="aw">What is it?</label><input id="aw" name="what" maxlength="60" placeholder="e.g. Photographer quote" value="' + esc(q ? q.name : '') + '"></div>' +
+      '<div class="field"><label for="ac">Category</label><select id="ac" name="category">' + E.CAT_NAMES.map(function (n) { return '<option' + (q && q.category === n ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="ap">Total price</label><input id="ap" name="total" type="number" required ' + MONEY + ' value="' + (q ? q.total : '') + '"></div>' +
+      '<div class="field"><label for="ad">Deposit (0 if none)</label><input id="ad" name="deposit" type="number" ' + MONEY + ' value="' + (q ? q.deposit : '') + '"></div>' +
+      '<div class="field"><label for="add">Deposit due</label><input id="add" name="depositDue" type="date" value="' + esc(q ? q.depositDue : d0) + '"></div>' +
+      '<div class="field"><label for="abd">Final balance due</label><input id="abd" name="balanceDue" type="date" value="' + esc(q ? q.balanceDue : bd) + '"></div></div>' +
+      '<div class="actions"><button class="btn primary" type="submit">Check it</button></div></form>';
+    if (q) {
+      var r = E.canAffordVendor(S, t, q), cls = r.verdict === 'yes' ? 'ok' : r.verdict === 'stretch' ? 'wait' : 'no';
+      var title = r.verdict === 'yes' ? 'Yes, this fits' : r.verdict === 'stretch' ? 'It is a stretch' : 'This would put you over budget';
+      h += '<div class="afford ' + cls + '"><div class="verdict">' + title + '</div><div class="math">' +
+        '<div><span>Total budget left after this</span><span class="' + (r.remainingAfterC < 0 && r.budgetC > 0 ? 'neg' : '') + '">' + (r.budgetC > 0 ? mc(r.remainingAfterC) : 'no total budget set') + '</span></div>' +
+        (r.catBudgetC > 0 ? '<div><span>' + esc(r.category) + ' budget left after this</span><span class="' + (r.catRemainingAfterC < 0 ? 'neg' : '') + '">' + mc(r.catRemainingAfterC) + '</span></div>' : '') +
+        '<div><span>Monthly saving needed</span><span>' + mc(r.monthlyBeforeC) + ' → <b>' + mc(r.monthlyAfterC) + '</b> (' + mc(r.monthlyDeltaC, true) + ')</span></div>' +
+        (r.plannedC > 0 ? '<div><span>You plan to save</span><span>' + mc(r.plannedC) + ' a month' + (r.savingsShort ? ' · <b class="neg">not enough</b>' : ' · enough') + '</span></div>' : '') +
+        (r.gapAfterC > 0 ? '<div><span>Cash needed before your first monthly deposit</span><span class="neg">' + mc(r.gapAfterC) + '</span></div>' : '') +
+        (r.perGuestDeltaC !== null ? '<div><span>Cost per guest</span><span>' + mc(r.perGuestBeforeC) + ' → <b>' + mc(r.perGuestAfterC) + '</b> (' + mc(r.perGuestDeltaC, true) + ')</span></div>' : '') + '</div>' +
+        '<div class="actions" style="margin-top:10px"><button class="btn small primary" data-act="affordAdd" data-st="booked">Add as booked</button><button class="btn small" data-act="affordAdd" data-st="considering">Add as “considering”</button><button class="btn small" data-act="affordClear">Clear</button></div></div>';
+    }
+    h += '</div>';
+    var g = whatIfG === null ? S.wedding.guests : whatIfG;
+    h += '<div class="card"><h2>What if the guest count changes?</h2><p class="note">Vendors priced per guest (catering, bar) change with the count. Flat-price vendors do not.</p><form data-form="whatif" class="actions"><input type="number" name="g" min="0" max="1000" step="1" value="' + esc(g || '') + '" aria-label="Guest count" style="max-width:140px" required><button class="btn primary" type="submit">Check</button></form>';
+    if (whatIfG !== null) { var w = E.whatIfGuests(S, whatIfG); h += '<div class="math" style="margin-top:12px"><div><span>Booked cost with ' + whatIfG + ' guests</span><span>' + mc(w.committedC) + '</span></div><div><span>Change from now</span><span class="' + (w.deltaC > 0 ? 'neg' : 'pos') + '">' + mc(w.deltaC, true) + '</span></div>' + (w.perGuestC !== null ? '<div><span>Cost per guest</span><span>' + mc(w.perGuestC) + '</span></div>' : '') + (c.sm.budgetC > 0 ? '<div class="tot"><span>Budget left</span><span class="' + (w.remainingC < 0 ? 'neg' : '') + '">' + mc(w.remainingC) + '</span></div>' : '') + '</div><div class="actions" style="margin-top:8px"><button class="btn small" data-act="useWhatIf">Use ' + whatIfG + ' as my guest count</button></div>'; }
+    return h + '</div>';
+  }
+  function pageGuests() {
+    var gs = E.guestStats(S), h = '<div class="card"><div class="row" style="border:0;padding:0"><div class="main"><h2 style="margin:0">Guest list</h2><div class="s">Your planning count is <b>' + S.wedding.guests + '</b></div></div><button class="btn primary" data-act="addGuest">+ Add a guest or party</button></div>' +
+      '<div class="grid g3" style="margin-top:12px"><div class="stat"><div class="v">' + gs.invited + '</div><div class="l">Invited</div></div><div class="stat"><div class="v pos">' + gs.yes + '</div><div class="l">Coming</div></div><div class="stat"><div class="v">' + gs.pending + '</div><div class="l">No answer yet · ' + gs.no + ' not coming</div></div></div>';
+    if (gs.invited) h += '<div class="actions" style="margin-top:12px"><button class="btn" data-act="useGuests" data-n="' + gs.expected + '">Use ' + gs.expected + ' (coming + no answer) as my guest count</button></div><p class="note">The cost per guest and per-guest vendors follow your guest count.</p>';
+    h += '</div>';
+    if (!S.guestList.length) return h + '<div class="card empty">No guests yet. Add a family or a group as one line, with how many people it is.</div>';
+    h += '<div class="card">' + S.guestList.map(function (g) {
+      return '<div class="row"><div class="main"><div class="t">' + esc(g.name) + '</div><div class="s">' + plural(Math.max(1, +g.count || 1), 'person').replace('persons', 'people') + '</div></div><div class="seg rs" role="group" aria-label="Answer for ' + esc(g.name) + '">' + [['yes', 'Coming'], ['pending', 'Waiting'], ['no', 'No']].map(function (r) { return '<button data-act="rsvp" data-id="' + g.id + '" data-r="' + r[0] + '" aria-pressed="' + (g.rsvp === r[0]) + '">' + r[1] + '</button>'; }).join('') + '</div>' +
+        '<div class="actions"><button class="btn small" data-act="editGuest" data-id="' + g.id + '">Edit</button><button class="btn small danger" data-act="delGuest" data-id="' + g.id + '" aria-label="Delete ' + esc(g.name) + '">✕</button></div></div>';
+    }).join('') + '</div>';
+    return h;
+  }
+  function pageSetup() {
+    var w = S.wedding, sv = S.savings, c = ctx(), h = '';
+    h += '<div class="card"><h2>Your wedding</h2><div class="grid g2"><div class="field"><label for="s_date">Wedding date</label><input id="s_date" type="date" data-set="wedding.date" value="' + esc(w.date) + '"></div>' +
+      '<div class="field"><label for="s_guests">Guests (your planning count)</label><input id="s_guests" type="number" min="0" max="1000" step="1" inputmode="numeric" data-set="wedding.guests" value="' + esc(w.guests || '') + '"></div>' +
+      '<div class="field"><label for="s_budget">Total budget</label><input id="s_budget" type="number" ' + MONEY + ' data-set="wedding.budget" value="' + esc(w.budget || '') + '"></div></div></div>';
+    h += '<div class="card"><h2>Your savings</h2><div class="grid g2"><div class="field"><label for="s_saved">Saved so far for the wedding</label><input id="s_saved" type="number" ' + MONEY + ' data-set="savings.saved" value="' + esc(sv.saved || '') + '"></div>' +
+      '<div class="field"><label for="s_monthly">What you can put aside each month</label><input id="s_monthly" type="number" ' + MONEY + ' data-set="savings.monthly" value="' + esc(sv.monthly || '') + '"></div></div>' +
+      '<p class="note">“Saved so far” should include <b>everything</b> you have put toward the wedding, including money you have already paid to vendors. The app subtracts the payments you mark as paid. Right now ' + mc(c.plan.availableC) + ' is set aside for what is still to come.</p></div>';
+    h += '<div class="card"><div class="row" style="border:0;padding:0"><div class="main"><h2 style="margin:0">Gifts and family help</h2><div class="s">Money others are giving toward the wedding</div></div><button class="btn primary" data-act="addGift">+ Add</button></div>' +
+      (S.gifts.length ? S.gifts.map(function (g) { return '<div class="row"><div class="main"><div class="t">' + esc(g.name) + '</div><div class="s">' + (g.received ? '<span class="pill good">Received</span>' : 'Expected ' + dlabel(g.date)) + '</div></div><div class="amt pos">' + mc(E.cents(g.amount)) + '</div><div class="actions">' + (g.received ? '<button class="btn small" data-act="giftUndo" data-id="' + g.id + '">Undo</button>' : '<button class="btn small primary" data-act="giftGot" data-id="' + g.id + '">Received</button>') + '<button class="btn small" data-act="editGift" data-id="' + g.id + '">Edit</button><button class="btn small danger" data-act="delGift" data-id="' + g.id + '" aria-label="Delete gift">✕</button></div></div>'; }).join('') : '<p class="note">Nothing yet. If parents or relatives are contributing, add it here and your monthly amount drops.</p>') + '</div>';
+    h += '<div class="card"><h2>Appearance</h2><div class="seg" role="group" aria-label="Theme"><button data-act="theme" data-t="blush" aria-pressed="' + (S.settings.theme === 'blush') + '">Blush</button><button data-act="theme" data-t="sage" aria-pressed="' + (S.settings.theme === 'sage') + '">Sage</button><button data-act="theme" data-t="midnight" aria-pressed="' + (S.settings.theme === 'midnight') + '">Midnight</button></div>' +
+      '<div class="field" style="max-width:200px;margin-top:14px"><label for="cur">Currency symbol</label><input id="cur" data-cur maxlength="3" value="' + esc(S.settings.currency) + '"></div></div>';
+    h += '<div class="card"><h2>Your data stays on this device</h2><p>Everything you enter is saved in this browser on this device only. Nothing is uploaded and no account is needed. Browsers can clear saved data, so <b>download a backup now and then</b>. Keep that file somewhere safe: it brings everything back.</p><div class="actions"><button class="btn primary" data-act="backup">Download backup</button><button class="btn" data-act="restore">Restore from backup</button><button class="btn" data-act="csvPay">Export payments (CSV)</button><button class="btn" data-act="csvGuests">Export guest list (CSV)</button></div><input id="restoreFile" type="file" accept=".json,application/json" hidden></div>';
+    h += '<div class="card"><h2>How the savings plan works</h2><p class="note">1. Take what you have set aside now. 2. Add gifts you expect, on the dates they arrive. 3. List every unpaid vendor payment with its due date. 4. Find the smallest steady monthly deposit that keeps your balance at or above zero on every payment date. Open <i>Show the math</i> on the Plan page to see each step.</p></div>';
+    h += '<div class="card"><h2>Start over</h2><div class="actions"><button class="btn" data-act="loadExample">Load example data</button><button class="btn danger" data-act="clearAll">Erase everything</button></div></div>';
+    return h;
+  }
+
+  /* ---------- render ---------- */
+  var PAGES = [['plan', 'Plan'], ['afford', 'Can we afford it?'], ['vendors', 'Vendors'], ['calendar', 'Payments'], ['budget', 'Budget'], ['guests', 'Guests'], ['setup', 'Setup']];
+  function render() {
+    document.documentElement.setAttribute('data-theme', S.settings.theme);
+    var fn = { plan: pagePlan, afford: pageAfford, vendors: pageVendors, calendar: pageCalendar, budget: pageBudget, guests: pageGuests, setup: pageSetup }[page], scroll = window.scrollY, ae = document.activeElement, aid = ae && ae.id;
+    document.getElementById('app').innerHTML = (DEMO ? '<div class="banner" style="background:var(--soft);color:var(--ink)"><b>Free demo.</b> Everything works with sample numbers. Backup, restore and CSV export are in the full app file (LedgerAndEase on Etsy).</div>' : '') +
+      (storageOK ? '' : '<div class="banner">This browser is not saving your data (private window or blocked storage). Use Download backup in Setup so you do not lose your work.</div>') +
+      '<header class="top"><div class="brand">Wedding Budget<small>Plan every payment · works offline · data stays on this device</small></div></header><nav class="tabs" aria-label="Pages">' +
+      PAGES.map(function (p) { return '<button data-nav="' + p[0] + '"' + (p[0] === page ? ' aria-current="page"' : '') + '>' + p[1] + '</button>'; }).join('') + '</nav><main>' + fn() + '</main>';
+    window.scrollTo(0, scroll); if (aid) { var el = document.getElementById(aid); if (el && el.tagName === 'INPUT') { el.focus(); } }
+  }
+
+  /* ---------- downloads ---------- */
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type || 'text/plain' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function csv(rows) { return rows.map(function (r) { return r.map(function (c) { c = String(c == null ? '' : c); return /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\r\n'); }
+  function setPath(path, val) { var p = path.split('.'); S[p[0]][p[1]] = val; }
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', function (e) {
+    var nav = e.target.closest('[data-nav]'); if (nav) { page = nav.getAttribute('data-nav'); render(); window.scrollTo(0, 0); return; }
+    var el = e.target.closest('[data-act]'); if (!el) return;
+    var a = el.getAttribute('data-act'), id = el.getAttribute('data-id'), pid = el.getAttribute('data-pid'), t = todayIso(), v = id ? vendorById(id) : null;
+    function pay() { return v ? v.payments.filter(function (x) { return x.id === pid; })[0] : null; }
+    switch (a) {
+      case 'closeModal': closeModal(); break;
+      case 'addVendor': editVendor(null); break; case 'editVendor': editVendor(id); break;
+      case 'toggleV': openV[id] = !openV[id]; render(); break;
+      case 'bookV': if (v) { v.status = 'booked'; save(); render(); } break;
+      case 'delVendor': confirmBox('Delete this vendor?', 'The vendor and its payments are removed from your plan. This cannot be undone.', 'Delete', function () { S.vendors = S.vendors.filter(function (x) { return x.id !== id; }); save(); render(); }); break;
+      case 'addPay': editPayment(id, null); break; case 'editPay': editPayment(id, pid); break;
+      case 'delPay': confirmBox('Delete this payment?', 'It is removed from the payment schedule.', 'Delete', function () { v.payments = v.payments.filter(function (x) { return x.id !== pid; }); save(); render(); }); break;
+      case 'markPaid': var p1 = pay(); if (p1) { p1.paid = true; p1.paidOn = t; save(); render(); } break;
+      case 'unpaid': var p2 = pay(); if (p2) { p2.paid = false; delete p2.paidOn; save(); render(); } break;
+      case 'addGift': editGift(null); break; case 'editGift': editGift(id); break;
+      case 'giftGot': S.gifts.forEach(function (g) { if (g.id === id) g.received = true; }); save(); render(); break;
+      case 'giftUndo': S.gifts.forEach(function (g) { if (g.id === id) g.received = false; }); save(); render(); break;
+      case 'delGift': confirmBox('Delete this gift?', 'It will stop counting toward your savings.', 'Delete', function () { S.gifts = S.gifts.filter(function (g) { return g.id !== id; }); save(); render(); }); break;
+      case 'addGuest': editGuest(null); break; case 'editGuest': editGuest(id); break;
+      case 'delGuest': confirmBox('Remove this guest?', 'They are removed from your list.', 'Remove', function () { S.guestList = S.guestList.filter(function (g) { return g.id !== id; }); save(); render(); }); break;
+      case 'rsvp': S.guestList.forEach(function (g) { if (g.id === id) g.rsvp = el.getAttribute('data-r'); }); save(); render(); break;
+      case 'useGuests': S.wedding.guests = +el.getAttribute('data-n'); save(); render(); break;
+      case 'useWhatIf': S.wedding.guests = whatIfG; whatIfG = null; save(); render(); break;
+      case 'toggleTl': showAllTl = !showAllTl; render(); break;
+      case 'affordClear': affordQ = null; render(); break;
+      case 'affordAdd': if (affordQ) {
+        var nv = { id: uid(), name: affordQ.name || 'New vendor', category: affordQ.category, status: el.getAttribute('data-st'), total: round2(affordQ.total), perGuest: 0, payments: [] };
+        if (affordQ.deposit > 0) nv.payments.push({ id: uid(), label: 'Deposit', amount: round2(Math.min(affordQ.deposit, affordQ.total)), due: affordQ.depositDue, paid: false });
+        nv.payments.push({ id: uid(), label: 'Final balance', amount: 0, due: affordQ.balanceDue, paid: false, balance: true }); S.vendors.push(nv); openV[nv.id] = true; affordQ = null; page = 'vendors'; save(); render(); } break;
+      case 'suggestSplit': if (!(S.wedding.budget > 0)) { openModal('Enter your total budget first', '<p>The suggested split divides your total budget between the categories. Set your total budget in Setup first.</p>', null); break; }
+        confirmBox('Suggest a split?', 'This fills every category budget with a typical share of your ' + mc(E.cents(S.wedding.budget)) + ' total (venue and catering get the most, with a buffer for surprises). It replaces any category amounts you typed. You can change each one afterwards.', 'Fill them in', function () { var sp = E.splitBudget(E.cents(S.wedding.budget)); E.CAT_NAMES.forEach(function (n) { S.categoryBudgets[n] = sp[n] / 100; }); save(); render(); }); break;
+      case 'theme': S.settings.theme = el.getAttribute('data-t'); save(); render(); break;
+      case 'loadExample': confirmBox('Load example data?', 'This replaces what is in the app now with a sample wedding. Download a backup first if you want to keep your own.', 'Load example', function () { S = exampleData(); save(); page = 'plan'; render(); }); break;
+      case 'clearAll': confirmBox('Erase everything?', 'This removes all your data from this browser. This cannot be undone unless you have a backup.', 'Erase', function () { S = blank(); save(); page = 'plan'; render(); }); break;
+      case 'backup': case 'restore': case 'csvPay': case 'csvGuests': if (DEMO) { openModal('Included in the full app', '<p>Backup, restore and CSV export are part of the full app file. This demo lets you try everything else.</p>', null); return; }
+        if (a === 'backup') { var dl = function () { download('wedding-budget-backup-' + t + '.json', JSON.stringify(S, null, 1), 'application/json'); }; if (!S.vendors.length && !S.guestList.length) confirmBox('Nothing to back up yet', 'The app is empty right now, so this backup file would be empty too. Download it anyway?', 'Download anyway', dl); else dl(); }
+        else if (a === 'restore') document.getElementById('restoreFile').click();
+        else if (a === 'csvPay') download('wedding-payments.csv', csv([['Date', 'Vendor', 'Payment', 'Amount', 'Paid']].concat(E.calendar(S, t).map(function (x) { return [x.date, x.vendor, x.label, (x.amountC / 100).toFixed(2), x.paid ? 'yes' : 'no']; }))), 'text/csv');
+        else download('wedding-guests.csv', csv([['Name', 'People', 'Answer']].concat(S.guestList.map(function (g) { return [g.name, g.count, g.rsvp]; }))), 'text/csv');
+        break;
+    }
+  });
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.id === 'restoreFile' && el.files && el.files[0]) {
+      var rd = new FileReader();
+      rd.onload = function () { try { var n = normalize(JSON.parse(rd.result)); confirmBox('Restore this backup?', (n.vendors.length || n.guestList.length ? 'This replaces the data in the app with the backup (' + n.vendors.length + ' vendors, ' + n.guestList.length + ' guest lines).' : 'This backup is EMPTY (0 vendors, 0 guest lines). Restoring it will erase what is in the app now. Cancel if you chose the wrong file.'), 'Restore', function () { S = n; save(); render(); }); } catch (err) { openModal('Could not restore', '<p>' + esc(err.message || 'The file could not be read.') + '</p>', null); } };
+      rd.readAsText(el.files[0]); el.value = '';
+    } else if (el.hasAttribute('data-catbudget')) { S.categoryBudgets[el.getAttribute('data-catbudget')] = Math.max(0, round2(num(el.value))); save(); render(); }
+    else if (el.hasAttribute('data-set')) {
+      var path = el.getAttribute('data-set'), val = el.type === 'date' ? (validDate(el.value) ? el.value : '') : (path === 'wedding.guests' ? Math.max(0, Math.floor(num(el.value))) : Math.max(0, round2(num(el.value))));
+      setPath(path, val); save(); render();
+    } else if (el.hasAttribute('data-cur')) { S.settings.currency = el.value.trim() || '$'; save(); render(); }
+  });
+  document.addEventListener('submit', function (e) {
+    var f = e.target, k = f.getAttribute('data-form'); if (!k) return; e.preventDefault();
+    if (k === 'afford') {
+      var tot = num(f.total.value); if (!(tot > 0)) return;
+      affordQ = { name: f.what.value.trim(), category: f.category.value, total: round2(tot), deposit: Math.max(0, round2(num(f.deposit.value))), depositDue: validDate(f.depositDue.value) ? f.depositDue.value : '', balanceDue: validDate(f.balanceDue.value) ? f.balanceDue.value : '' };
+      render();
+    } else if (k === 'whatif') { var g = Math.floor(num(f.g.value)); if (g >= 0) { whatIfG = g; render(); } }
+  });
+
+  S = load();
+  if (DEMO && !S.vendors.length && !(S.wedding.budget > 0)) { S = exampleData(); save(); }
+  render();
+  window.__wba = { get state() { return S; }, render: render, setPage: function (p) { page = p; render(); } };
+})();
+</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}</script></body></html>
